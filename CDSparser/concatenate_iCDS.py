@@ -1,15 +1,15 @@
-#!/usr/bin/env python
+#!/usr/pbin/env python
 
 """
 fetch data/iCDS.fa, and concatenate iCDS into complete CDS.
 
-if neccessary:
-
+check if CDS has the correct stopcodon (TAA, TGA, TAG)
+check if CDS is multiple of three (3N)
+translate CDS into PEP
 output data/CDS.fa
-
-translate CDS
-
 output data/PEP.fa
+output reports of stopcodon
+output reports of 3N
 """
 
 from pyfaidx import Fasta
