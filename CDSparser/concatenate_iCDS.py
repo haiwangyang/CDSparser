@@ -1,4 +1,4 @@
-#!/usr/pbin/env python
+#!/usr/bin/env python
 
 """
 fetch data/iCDS.fa, and concatenate iCDS into complete CDS.
