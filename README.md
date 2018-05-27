@@ -13,8 +13,6 @@ cat UCSC1.final.noSEQ.gff | awk -v OFS='\t' -v FS='\t' '$2=="maker"&&$3=="CDS" {
 ## concatenate to make full CDS
 python3 concatenate_iCDS.py
 
-## translate
-python3 translate_CDS.py
 
 
 
