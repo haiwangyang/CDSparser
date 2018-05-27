@@ -97,7 +97,7 @@ class CDS:
 
 if __name__ == '__main__':
     c = CDS()
-    write_dct_fasta(c.CDSdct, "data/CDS.fa")
-    write_dct_fasta(c.PEPdct, "data/PEP.fa")
-    write_dct_table(c.ifstopcodon, "data/ifstopcodon.txt")
-    write_dct_table(c.if3n, "data/if3n.txt")
+    write_dct_fasta(c.CDSdct, "output/CDS.fa")
+    write_dct_fasta(c.PEPdct, "output/PEP.fa")
+    write_dct_table(c.ifstopcodon, "output/ifstopcodon.txt")
+    write_dct_table(c.if3n, "output/if3n.txt")
