@@ -31,9 +31,11 @@ class CDS:
         self.iCDSfasta = Fasta("data/iCDS.fa", as_raw = True)
         self.get_iCDS_dct()
         self.get_CDS_dct()
+        self.check_start_codon()
         self.check_stop_codon()
         self.check_3n()
         self.get_PEP_dct()
+        self.get_MPEP_dct()
 
     def get_iCDS_dct(self):
         """ get iCDS dict """
@@ -67,6 +69,16 @@ class CDS:
             dct[geneid] = cds
         self.CDSdct = dct
 
+    def check_start_codon(self):
+        dct = dict()
+        for geneid in self.CDSdct.keys():
+            cds = self.CDSdct[geneid]
+            if cds.startswith("ATG"):
+                dct[geneid] = "y"
+            else:
+                dct[geneid] = "n"
+        self.ifstartcodon = dct
+
     def check_stop_codon(self):
         dct = dict()
         for geneid in self.CDSdct.keys():
@@ -92,12 +104,34 @@ class CDS:
         for geneid in self.CDSdct.keys():
             cds = self.CDSdct[geneid]
             pep = str(Seq(cds).translate())
+            #print(cds)
+            #print(pep)
+            #print("\n")
             dct[geneid] = pep
         self.PEPdct = dct
+
+    def get_MPEP_dct(self):
+        """
+        if PEP not start with M
+        find the first M
+        """
+        dct = dict()
+        for geneid in sorted(self.ifstartcodon.keys()):            
+            if self.ifstartcodon[geneid] == "y":
+                dct[geneid] = self.PEPdct[geneid]
+            else:
+                PEP = self.PEPdct[geneid]
+                f = PEP.find("M")
+                if f == -1:
+                    dct[geneid + " ATTENTION " + str(f)] = PEP
+                else:
+                    dct[geneid + " ATTENTION " + str(f)] = PEP[f:len(PEP)]
+        self.MPEPdct = dct       
 
 if __name__ == '__main__':
     c = CDS()
     write_dct_fasta(c.CDSdct, "output/CDS.fa")
     write_dct_fasta(c.PEPdct, "output/PEP.fa")
+    write_dct_fasta(c.MPEPdct, "output/MPEP.fa")
     write_dct_table(c.ifstopcodon, "output/ifstopcodon.txt")
     write_dct_table(c.if3n, "output/if3n.txt")
