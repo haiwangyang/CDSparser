@@ -20,7 +20,7 @@ UMSG3_5th.noSEQ.gff<br>
 ## get CDS in exons
 mkdir data/<br>
 for i in \`echo UCSC1 UMSG1 UMSG2 UMSG3\`; do
-cat ${i}_5th.noSEQ.gff | awk -v OFS='\t' -v FS='\t' '$2=="maker"&&$3=="CDS" {print $1, $4-1, $5, $1 ":" $4 "-" $5 ";" $9, "1", $7}' | bedtools getfasta -s -name -fi UCSC1_CLC_de_novo_rmhost_mod.fa -bed - -fo data/$i.iCDS.fa;
+cat ${i}_5th.noSEQ.gff | awk -v OFS='\t' -v FS='\t' '$2=="maker"&&$3=="CDS" {print $1, $4-1, $5, $1 ":" $4 "-" $5 ";" $9, "1", $7}' | bedtools getfasta -s -name -fi ${i}_CLC_de_novo_rmhost_mod.fa -bed - -fo data/$i.iCDS.fa;
 done
 <br>
 
