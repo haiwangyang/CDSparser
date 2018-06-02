@@ -29,13 +29,14 @@ def write_dct_table(dct, path):
 
 class Bed:
     """ Bed object (now only use for maker) """
-    def __init__(self, feature):
+    def __init__(self, strain, feature):
+        self.strain = strain
         self.feature = feature
         self.get_feature_ids()
         self.get_scaffold2len()
         self.get_id2left_right()
         self.get_id2distance()
-        self.scaffoldfasta = Fasta("data/UCSC1_CLC_de_novo_rmhost_mod.fa", as_raw = True)
+        self.scaffoldfasta = Fasta("data/" + self.strain + "_CLC_de_novo_rmhost_mod.fa", as_raw = True)
 
     def get_feature_ids(self):
         """ get ids set
@@ -47,7 +48,7 @@ class Bed:
         self.id2ses = dict()       # gene start_ends
         self.id2strand = dict()    # gene strand
         self.id2scaffold = dict()
-        with open("data/" + self.feature + ".bed", "r") as f:
+        with open("data/" + self.strain + ".A." + self.feature + ".bed", "r") as f:
             for line in f.readlines():
                 scaffold, start, end, name, one, strand = line.rstrip().split("\t")
                 id = get_id_from_name(name)
@@ -60,7 +61,7 @@ class Bed:
 
     def get_scaffold2len(self):
         self.scaffold2len = dict()
-        with open("data/UCSC1_CLC_de_novo_rmhost_mod.fa.fai", "r") as f:
+        with open("data/" + self.strain + "_CLC_de_novo_rmhost_mod.fa.fai", "r") as f:
             for line in f.readlines():
                 elements = line.rstrip().split("\t")
                 self.scaffold2len[elements[0]] = int(elements[1])
@@ -75,15 +76,22 @@ class Bed:
         for id in self.ids:
             self.id2left[id] = 9999999999999999
             self.id2right[id] = 0
+            print(self.id2left[id])
+            print(self.id2right[id])        
 
         for id in self.ids:
             for start_end in self.id2ses[id]:
                 start, end = get_start_end_from_string(start_end)
+                print(self.id2scaffold[id], id, self.id2strand[id], str(start), str(end))
+                print("now left is " + str(self.id2left[id]) + "; now right is " + str(self.id2right[id]))
                 if start < self.id2left[id]:
                     self.id2left[id] = start
+                    print("assign left: " + str(start))
                 if end > self.id2right[id]:
                     self.id2right[id] = end
-                
+                    print("assign right: " + str(end))
+            print("\n\n")
+
     def get_id2distance(self):
         """
            get distance to scaffold boudnary
@@ -98,17 +106,22 @@ class Bed:
             scaffoldlen = self.scaffold2len[scaffold]
             left_distance = left
             right_distance = scaffoldlen - right
+            print(id + "\t" + "ld:" + str(left_distance) + "; rd: " + str(right_distance))
             if strand == "+":
                 self.id2five_distance[id] = left_distance
                 self.id2three_distance[id] = right_distance
+                print(id + " five: " + str(left_distance) + "; three: " + str(right_distance))
             elif strand == "-":
                 self.id2five_distance[id] = right_distance
                 self.id2three_distance[id] = left_distance
+                print(id + " five: " + str(right_distance) + "; three: " + str(left_distance))
+            print("\n\n")
 
 if __name__ == '__main__':
-    b = Bed("maker")
-    write_dct_table(b.id2left, "output/left.txt")
-    write_dct_table(b.id2right, "output/right.txt")
-    write_dct_table(b.id2five_distance, "output/five_distance.txt")
-    write_dct_table(b.id2three_distance, "output/three_distance.txt")
+    for strain in ['UCSC1', 'UMSG1', 'UMSG2', 'UMSG3']:
+        b = Bed(strain, "maker")
+        write_dct_table(b.id2left, "output/" + strain + ".left.txt")
+        write_dct_table(b.id2right, "output/" + strain + ".right.txt")
+        write_dct_table(b.id2five_distance, "output/" + strain + ".five_distance.txt")
+        write_dct_table(b.id2three_distance, "output/" + strain + ".three_distance.txt")
 

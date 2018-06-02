@@ -22,20 +22,22 @@ def write_dct_fasta(dct, path):
 
 def write_dct_table(dct, path):
     with open(path, "w") as f:
-        for i in dct.keys():
-            f.write(i + "\t" + dct[i] + "\n")
+        for i in sorted(dct.keys()):
+            f.write(str(i) + "\t" + str(dct[i]) + "\n")
 
 class CDS:
     """ CDS object """
-    def __init__(self):
-        self.iCDSfasta = Fasta("data/iCDS.fa", as_raw = True)
+    def __init__(self, strain):
+        self.strain = strain
+        self.iCDSfasta = Fasta("data/" + self.strain + ".iCDS.fa", as_raw = True)
         self.get_iCDS_dct()
         self.get_CDS_dct()
         self.check_start_codon()
         self.check_stop_codon()
         self.check_3n()
         self.get_PEP_dct()
-        self.get_MPEP_dct()
+        self.get_Mpos()
+        #self.get_MPEP_dct()
 
     def get_iCDS_dct(self):
         """ get iCDS dict """
@@ -110,6 +112,18 @@ class CDS:
             dct[geneid] = pep
         self.PEPdct = dct
 
+    def get_Mpos(self):
+        """
+           get M position
+        """
+        dct = dict()
+        for geneid in sorted(self.ifstartcodon.keys()):
+            PEP = self.PEPdct[geneid]
+            f = PEP.find("M")
+            dct[geneid] = f
+        self.Mpos = dct
+
+
     def get_MPEP_dct(self):
         """
         if PEP not start with M
@@ -129,9 +143,10 @@ class CDS:
         self.MPEPdct = dct       
 
 if __name__ == '__main__':
-    c = CDS()
-    write_dct_fasta(c.CDSdct, "output/CDS.fa")
-    write_dct_fasta(c.PEPdct, "output/PEP.fa")
-    write_dct_fasta(c.MPEPdct, "output/MPEP.fa")
-    write_dct_table(c.ifstopcodon, "output/ifstopcodon.txt")
-    write_dct_table(c.if3n, "output/if3n.txt")
+    for strain in ['UCSC1', 'UMSG1', 'UMSG2', 'UMSG3']:
+        c = CDS(strain)
+        write_dct_fasta(c.CDSdct, "output/" + strain + ".CDS.fa")
+        write_dct_fasta(c.PEPdct, "output/" + strain + ".PEP.fa")
+        write_dct_table(c.ifstopcodon, "output/" + strain + ".ifstopcodon.txt")
+        write_dct_table(c.if3n, "output/" + strain + ".if3n.txt")
+        write_dct_table(c.Mpos, "output/" + strain + ".Mpos.txt")
