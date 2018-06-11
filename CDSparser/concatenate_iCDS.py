@@ -144,6 +144,7 @@ class CDS:
 
 if __name__ == '__main__':
     for strain in ['UCSC1', 'UMSG1', 'UMSG2', 'UMSG3']:
+        print(strain)
         c = CDS(strain)
         write_dct_fasta(c.CDSdct, "output/" + strain + ".CDS.fa")
         write_dct_fasta(c.PEPdct, "output/" + strain + ".PEP.fa")
